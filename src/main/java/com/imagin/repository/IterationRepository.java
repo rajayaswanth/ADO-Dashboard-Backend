@@ -19,7 +19,7 @@ public interface IterationRepository extends JpaRepository<Iterations, Integer> 
 	@Query(value = "SELECT * FROM dashboard.iterations i where i.start_date >= :startDate AND i.end_date <= :endDate AND i.team_name = :teamName AND i.time_frame != 'future';", nativeQuery = true)
 	List<Iterations> findAllByTeamNameAndDate(String teamName, Date startDate, Date endDate);
 	
-	@Query("SELECT DISTINCT a.teamName FROM Iterations a")
+	@Query("SELECT DISTINCT a.teamName FROM Iterations a ORDER BY a.teamName")
 	List<String> findDistinctTeamName();
 
 }

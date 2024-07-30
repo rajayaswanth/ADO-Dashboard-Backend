@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.imagin.entity.Iterations;
+import com.imagin.entity.Users;
 import com.imagin.entity.WorkItems;
 import com.imagin.model.Iteration;
 import com.imagin.model.IterationResponse;
@@ -27,6 +28,7 @@ import com.imagin.model.WorkItemFields;
 import com.imagin.model.WorkItemRelationDetails;
 import com.imagin.model.WorkItemRelations;
 import com.imagin.repository.IterationRepository;
+import com.imagin.repository.UserRepository;
 import com.imagin.repository.WorkItemsRepository;
 import com.imagin.service.DataImportService;
 
@@ -48,6 +50,9 @@ public class DataImportServiceImpl implements DataImportService {
 	
 	@Autowired
 	WorkItemsRepository workItemsRepository;
+	
+	@Autowired
+	UserRepository userRepository;
 	
 	SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss a", Locale.ENGLISH);
 
@@ -134,7 +139,7 @@ public class DataImportServiceImpl implements DataImportService {
 			WorkItems workItems = new WorkItems();
 			if(workItemDetails.getRelations() != null) {
 				for (WorkItemRelationDetails workItems2 : workItemDetails.getRelations()) {
-					if(workItems2.getAttributes().getName().equals("Pull Request")) {
+					if(workItems2.getAttributes().getName() != null && workItems2.getAttributes().getName().equals("Pull Request")) {
 						String prUrl = workItems2.getUrl();
 						String[] urlChunk = prUrl.split("%2F");
 						String prNumber = urlChunk[urlChunk.length-1];
@@ -162,6 +167,15 @@ public class DataImportServiceImpl implements DataImportService {
 			if(workItemDetails.getFields().getAssignedTo() != null) {
 				workItems.setAssignedTo(workItemDetails.getFields().getAssignedTo().getDisplayName());
 				workItems.setAssignedEmail(workItemDetails.getFields().getAssignedTo().getEmail());
+				Users user = userRepository.findByEmail(workItemDetails.getFields().getAssignedTo().getEmail());
+				if(user == null) {
+					Users newUser = new Users();
+					newUser.setEmail(workItemDetails.getFields().getAssignedTo().getEmail());
+					newUser.setName(workItemDetails.getFields().getAssignedTo().getDisplayName());
+					newUser.setTeamName(iterationDetails.getTeamName());
+					newUser.setGrc(true);
+					userRepository.save(newUser);
+				}
 			}
 			workItems.setDevelopmentCompletedDate(workItemDetails.getFields().getDevelopmentCompletedDate());
 			workItems.setDevStartDate(workItemDetails.getFields().getDevStartDate());

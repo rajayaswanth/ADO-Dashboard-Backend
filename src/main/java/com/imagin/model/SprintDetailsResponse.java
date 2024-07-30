@@ -1,6 +1,7 @@
 package com.imagin.model;
 
 import java.util.List;
+import java.util.Map;
 
 public class SprintDetailsResponse {
 	
@@ -15,6 +16,8 @@ public class SprintDetailsResponse {
 	private int sprintCompletePercentage;
 	
 	private String sprintName;
+	
+	private Map<String, List<SprintDetails>> userdata;
 
 	public List<SprintDetails> getSprintDetails() {
 		return sprintDetails;
@@ -62,6 +65,14 @@ public class SprintDetailsResponse {
 
 	public void setSprintName(String sprintName) {
 		this.sprintName = sprintName;
+	}
+
+	public Map<String, List<SprintDetails>> getUserdata() {
+		return userdata;
+	}
+
+	public void setUserdata(Map<String, List<SprintDetails>> userdata) {
+		this.userdata = userdata;
 	}
 	
 }
